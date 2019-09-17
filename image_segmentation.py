@@ -23,28 +23,9 @@ from tensorflow.python.keras import backend as K
 
 import os
 
-# Upload the API token.
-def get_kaggle_credentials():
-  token_dir = os.path.join(os.path.expanduser("~"),".kaggle")
-  token_file = os.path.join(token_dir, "kaggle.json")
-  if not os.path.isdir(token_dir):
-    os.mkdir(token_dir)
-  try:
-    with open(token_file,'r') as f:
-      pass
-  except IOError as no_file:
-    try:
-      from google.colab import files
-    except ImportError:
-      raise no_file
-    
-    uploaded = files.upload()
-    
-    if "kaggle.json" not in uploaded:
-      raise ValueError("You need an API key! see: "
-                       "https://github.com/Kaggle/kaggle-api#api-credentials")
-    with open(token_file, "wb") as f:
-      f.write(uploaded["kaggle.json"])
-    os.chmod(token_file, 600)
+import kaggle
 
-get_kaggle_credentials()
+# Upload the API token.
+
+# Get all the files
+
