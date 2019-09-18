@@ -51,7 +51,40 @@ get_kaggle_credentials()
 
 import kaggle
 
-# Upload the API token.
+competition_name = 'carvana-image-masking-challenge'
 
-# Get all the files
+# Download data from Kaggle and unzip the files of interest. 
+def load_data_from_zip(competition, file):
+  with zipfile.ZipFile(os.path.join(competition, file), "r") as zip_ref:
+    unzipped_file = zip_ref.namelist()[0]
+    zip_ref.extractall(competition)
+
+def get_data(competition):
+    kaggle.api.competition_download_files(competition, competition)
+    load_data_from_zip(competition, 'train.zip')
+    load_data_from_zip(competition, 'train_masks.zip')
+    load_data_from_zip(competition, 'train_masks.csv.zip')
+
+get_data(competition_name)
+
+img_dir = os.path.join(competition_name, "train")
+label_dir = os.path.join(competition_name, "train_masks")
+
+df_train = pd.read_csv(os.path.join(competition_name, 'train_masks.csv'))
+ids_train = df_train['img'].map(lambda s: s.split('.')[0])
+
+x_train_filenames = []
+y_train_filenames = []
+for img_id in ids_train:
+  x_train_filenames.append(os.path.join(img_dir, "{}.jpg".format(img_id)))
+  y_train_filenames.append(os.path.join(label_dir, "{}_mask.gif".format(img_id)))
+
+x_train_filenames, x_val_filenames, y_train_filenames, y_val_filenames = \
+                    train_test_split(x_train_filenames, y_train_filenames, test_size=0.2, random_state=42)
+
+num_train_examples = len(x_train_filenames)
+num_val_examples = len(x_val_filenames)
+
+print("Number of training examples: {}".format(num_train_examples))
+print("Number of validation examples: {}".format(num_val_examples))
 
